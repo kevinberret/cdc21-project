@@ -1,0 +1,25 @@
+/* ::ng-deep .mat-buttonSuccess{
+    background-color: #087f23;
+    color: #ffffff;
+}
+
+:host .mat-buttonError{
+    background-color: #ba000d;
+    color: #ffffff;
+} */
+
+:host .style-success {
+    color: #ffffff;
+    background-color: #087f23;
+}
+:host .style-success .mat-simple-snackbar-action  {
+    color: #ffffff;
+}
+:host .style-error {
+    color: #ffffff;
+    background-color: #ba000d;
+}
+:host .style-error .mat-simple-snackbar-action {
+    color: #ffffff;
+}
+
