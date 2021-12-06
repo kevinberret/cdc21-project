@@ -1,11 +1,12 @@
 {application, backend,
- [{description, "An OTP application"},
+ [{description, "Erlang CDC21 project"},
   {vsn, "0.1.0"},
   {registered, []},
   {mod, {backend_app, []}},
   {applications,
    [kernel,
-    stdlib
+    stdlib,
+    cowboy
    ]},
   {env,[]},
   {modules, []},

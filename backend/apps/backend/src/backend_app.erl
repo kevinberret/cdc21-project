@@ -9,10 +9,24 @@
 
 -export([start/2, stop/1]).
 
+% start(_StartType, _StartArgs) ->
+%     backend_sup:start_link().
+
+% stop(_State) ->
+%     ok.
+
 start(_StartType, _StartArgs) ->
+    Dispatch = cowboy_router:compile([{'_',
+                                       [{"/health", health_route, []}]}]),
+    {ok, _} = cowboy:start_clear(http,
+                                 [{port, 8080}],
+                                 #{env => #{dispatch => Dispatch},
+                                   middlewares =>
+                                       [cowboy_router,
+                                        ca_cowboy_middleware,
+                                        cowboy_handler]}),
     backend_sup:start_link().
 
-stop(_State) ->
-    ok.
+stop(_State) -> ok = cowboy:stop_listener(http).
 
 %% internal functions
