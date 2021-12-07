@@ -4,7 +4,6 @@
 
 store(Key, Value, Peer) ->
   Qref = make_ref(),
-  io:format("~w ~w ~w ~w ~n", [Peer, Key, Value, Qref]),
   Peer ! {add, Key, Value, Qref, self()},
   receive
     {Qref, Ans} ->

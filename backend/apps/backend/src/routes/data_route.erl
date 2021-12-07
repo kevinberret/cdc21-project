@@ -5,7 +5,7 @@
 init(Req, State) -> {cowboy_rest, Req, State}.
 
 allowed_methods(Req, State) ->
-    {[<<"GET">>, <<"POST">>], Req, State}.
+    {[<<"GET">>, <<"POST">>, <<"OPTIONS">>], Req, State}.
 
 content_types_accepted(Req, State) ->
     {[{{<<"application">>, <<"json">>, []}, post_data}],
@@ -18,22 +18,19 @@ content_types_provided(Req, State) ->
      State}.
 
 get_data(Req, State) ->
-    {ok, EncodedData, _} = cowboy_req:read_body(Req),
-    DecodedData = jiffy:decode(EncodedData),
-
-    case DecodedData of
-        {[{<<"key">>, Key}]} ->
-            Res = data:get(Key)
-    end,
-    io:format("found VALUE ~w ~n", [Res]),
-    {jiffy:encode(#{<<"result">> => Res}), Req, State}.
-
-    % cowboy_req:reply(
-    %     201,
-    %     #{<<"content-type">> => <<"application/json">>},
-    %     jiffy:encode({#{<<"result">> => Res}}),
-    %     Req
-    % ).
+    Key = binary_to_integer(cowboy_req:binding(key, Req)),
+    Res = data:get(Key),
+    case Res of
+        timeout ->
+            % Return timeout error.
+            cowboy_req:reply(
+                408,
+                Req
+            );
+        _ ->
+            % Return value found.
+            {jiffy:encode(#{<<"value">> => Res}), Req, State}
+    end.
 
 post_data(Req, _) ->
     {ok, EncodedData, _} = cowboy_req:read_body(Req),
@@ -41,7 +38,7 @@ post_data(Req, _) ->
 
     case DecodedData of
         {[{<<"key">>, Key}, {<<"value">>, Value}]} ->
-            data:post(Key, Value),
+            data:post(binary_to_integer(Key), Value),
             io:format("POST /process add a key/value ~w/~w~n", [Key, Value])
     end,
 

@@ -16,15 +16,16 @@ export class NotificationComponent implements OnInit {
 
   constructor(private _snackBar: MatSnackBar) {}
 
-  openSnackBar(message: string, actionText: string, notificationType: string) {
+  openSnackBar(message: string, notificationType: string) {
     const typeClass = notificationType === 'success' ? 'mat-primary' : 'mat-warn';
     this._snackBar.open(
       message,
-      actionText,
+      '',
       {
         horizontalPosition: this.horizontalPosition,
         verticalPosition: this.verticalPosition,
-        panelClass: ['mat-toolbar', typeClass]
+        panelClass: ['mat-toolbar', typeClass],
+        duration: 3000
       }
     );
   }

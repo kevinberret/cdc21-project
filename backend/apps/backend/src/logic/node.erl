@@ -124,6 +124,7 @@ notify({Nkey, Npid}, Id, Predecessor, Store) ->
     end.
 
 add(Key, Value, Qref, Client, Id, {Pkey, _}, {_, Spid}, Store) ->
+    io:format("~w ~w ~w ~n", [Key, Value, Id]),
     case key:between(Key, Pkey, Id) of
         true ->
             Client ! {Qref, ok} ,
@@ -137,15 +138,9 @@ lookup(Key, Qref, Client, Id, {Pkey, _}, Successor, Store) ->
     io:format("lookup ~w in store ~w ~n", [Key, Store]),
     case key:between(Key, Pkey, Id) of
         true ->
-            io:format("good node ~n"),
             {_, Value} = storage:lookup(Key, Store),
-            io:format(Value),
-            io:format("~n"),
-            % io:format("send to ~w~n", [pid_to_list(self())]),
-            io:format("~n"),
             Client ! {Qref, Value};
         false ->
-            io:format("wrong node, follow request ~n"),
             {_, Spid} = Successor,
             Spid ! {lookup, Key, Qref, Client} 
     end.

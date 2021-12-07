@@ -22,9 +22,7 @@ init([]) ->
 % get() -> gen_server:call(?MODULE, {get}).
 
 get(Key) ->
-    Item = dht:locate(Key, node0),
-    io:format("located: ~w~n", [Item]),
-    Item.
+    dht:locate(Key, node0).
 
 post(Key, Value) ->
     {inserted, {_, _}, _} = dht:store(Key, Value, node0),
