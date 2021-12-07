@@ -10,15 +10,18 @@ store(Key, Value, Peer) ->
       {inserted, {Key, Value}, Ans}
   after
     ?Timeout ->
-      io:format("Time out: no response~n", [])
+      io:format("Time out: no response~n", []),
+      timeout
   end.
 
 locate(Key, Peer) ->
   Qref = make_ref(),
   Peer ! {lookup, Key, Qref, self()},
   receive
-    {Qref, Node, Item} ->
-      {Node, Item};
+    {Qref, {Key, Value}} ->
+      Value;
+    {Qref, _, Item} ->
+      Item;
     {Qref, Item} ->
       Item
   after

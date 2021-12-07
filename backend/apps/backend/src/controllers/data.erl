@@ -25,8 +25,9 @@ get(Key) ->
     dht:locate(Key, node0).
 
 post(Key, Value) ->
-    {inserted, {_, _}, _} = dht:store(Key, Value, node0),
-    {reply, inserted}.
+    dht:store(Key, Value, node0).
+    % {inserted, {_, _}, _} = dht:store(Key, Value, node0),
+    % {reply, inserted}.
 % post(Key, _) ->
 %     {inserted, {_, _}, _} = dht:store(Key, value0, node0),
 %     {reply, inserted}.

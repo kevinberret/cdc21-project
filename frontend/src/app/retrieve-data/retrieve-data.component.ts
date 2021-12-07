@@ -1,3 +1,4 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
@@ -26,9 +27,14 @@ export class RetrieveDataComponent implements OnInit {
   lookup(key: string, $event: Event) {
     $event.preventDefault();
     this.value = '';
-    this.ds.getData(key).pipe(catchError((error: any) => {
+    this.ds.getData(key).pipe(catchError((error: HttpErrorResponse) => {
+      // Display correct error message depending on the HTTP status.
+      let errorMessage = 'An error occured, please try again later';
+      if(error.status === 404) {
+        errorMessage = 'Key not found';
+      }
       this.notification.openSnackBar(
-        'An error occured!',
+        errorMessage,
         'error'
       );
       return throwError(error.message);

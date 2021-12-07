@@ -5,7 +5,7 @@
 init(Req, State) -> {cowboy_rest, Req, State}.
 
 allowed_methods(Req, State) ->
-    {[<<"GET">>, <<"POST">>, <<"OPTIONS">>], Req, State}.
+    {[<<"GET">>, <<"POST">>], Req, State}.
 
 content_types_accepted(Req, State) ->
     {[{{<<"application">>, <<"json">>, []}, post_data}],
@@ -24,7 +24,13 @@ get_data(Req, State) ->
         timeout ->
             % Return timeout error.
             cowboy_req:reply(
-                408,
+                404,
+                Req
+            );
+        false ->
+            % Return timeout error.
+            cowboy_req:reply(
+                404,
                 Req
             );
         _ ->
@@ -38,14 +44,23 @@ post_data(Req, _) ->
 
     case DecodedData of
         {[{<<"key">>, Key}, {<<"value">>, Value}]} ->
-            data:post(binary_to_integer(Key), Value),
+            StoreRes = data:post(binary_to_integer(Key), Value),
             io:format("POST /process add a key/value ~w/~w~n", [Key, Value])
     end,
 
-    cowboy_req:reply(
-        201,
-        Req
-    ).
+    case StoreRes of
+        timeout ->
+            % Return timeout error.
+            cowboy_req:reply(
+                404,
+                Req
+            );
+        {inserted, {_, _}, _} ->
+            cowboy_req:reply(
+                201,
+                Req
+            )
+    end.
 
 known_methods(Req, State) ->
     Result = [<<"GET">>, <<"POST">>],
