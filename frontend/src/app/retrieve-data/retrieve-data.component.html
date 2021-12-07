@@ -1,0 +1,10 @@
+<form>
+    <mat-form-field>
+        <mat-label>Key</mat-label>
+        <input matInput #key>
+    </mat-form-field>
+    <button mat-mini-fab color="accent" (click)="lookup(this.key.value, $event)">
+        <mat-icon>search</mat-icon>
+    </button>
+  </form>
+  <p *ngIf="value !== ''">Value found! {{ value }}</p>
