@@ -1,13 +1,16 @@
 -module(storage).
 -export([create/0, add/3, lookup/2, split/2, merge/2]).
 
-create() -> [].
+create() ->
+    [].
 
 add(Key, Value, L) ->
+    io:format("add ~w:~w ~n", [Key, Value]),
     lists:keystore(Key, 1, L, {Key, Value}).
 
 lookup(Key, L) ->
-    lists:keyfind(Key, 1, L).
+    Res = lists:keyfind(Key, 1, L),
+    Res.
 
 split(Key, L) ->
     lists:partition(fun({K,_}) -> K =< Key end, L).

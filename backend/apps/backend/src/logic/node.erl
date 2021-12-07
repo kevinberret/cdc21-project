@@ -1,20 +1,21 @@
 -module(node).
--export([start/1, start/3]).
+-export([start/1, start/2]).
 
 -define(Stabilize, 1000).
 -define(Timeout, 3000).
 
 start(Id) ->
-    start(Id, nil, []).
-start(Id, Peer, Store) ->
-    spawn(fun() -> init(Id, Peer, Store) end).
+    start(Id, nil).
+start(Id, Peer) ->
+    spawn(fun() -> init(Id, Peer) end).
 
 % Schedule pointer refreshments.
 schedule_stabilize() ->
     timer:send_interval(?Stabilize, self(), stabilize).
 
-init(Id, Peer, Store) ->
+init(Id, Peer) ->
     Predecessor = nil,
+    Store = storage:create(),
     {ok, Successor} = connect(Id, Peer),
     schedule_stabilize(),
     node(Id, Predecessor, Successor, Store).
@@ -59,7 +60,6 @@ node(Id, Predecessor, Successor, Store) ->
             forward_probe(Ref, T, Nodes, Id, Successor, Store),
             node(Id, Predecessor, Successor, Store);
         {add, Key, Value, Qref, Client} ->
-            io:format("should add value ~n"),
             Added = add(Key, Value, Qref, Client, Id, Predecessor, Successor, Store),
             node(Id, Predecessor, Successor, Added);
         {lookup, Key, Qref, Client} ->
@@ -67,7 +67,11 @@ node(Id, Predecessor, Successor, Store) ->
             node(Id, Predecessor, Successor, Store);
         {handover, Elements} ->
             Merged = storage:merge(Store, Elements),
-            node(Id, Predecessor, Successor, Merged)
+            node(Id, Predecessor, Successor, Merged);
+        displayStore ->
+            io:format("Node ~w: Store data:~n", [Id]),
+            io:format("~p~n", [Store]),
+            node(Id, Predecessor, Successor, Store)
     end.
 
 stabilize(Pred, Id, Successor) ->
@@ -130,12 +134,18 @@ add(Key, Value, Qref, Client, Id, {Pkey, _}, {_, Spid}, Store) ->
     end.
 
 lookup(Key, Qref, Client, Id, {Pkey, _}, Successor, Store) ->
-    io:format("lookup ~w ~w ~n", [Key, Store]),
+    io:format("lookup ~w in store ~w ~n", [Key, Store]),
     case key:between(Key, Pkey, Id) of
         true ->
-            Result = storage:lookup(Key, Store),
-            Client ! {Qref, Result};
+            io:format("good node ~n"),
+            {_, Value} = storage:lookup(Key, Store),
+            io:format(Value),
+            io:format("~n"),
+            % io:format("send to ~w~n", [pid_to_list(self())]),
+            io:format("~n"),
+            Client ! {Qref, Value};
         false ->
+            io:format("wrong node, follow request ~n"),
             {_, Spid} = Successor,
             Spid ! {lookup, Key, Qref, Client} 
     end.

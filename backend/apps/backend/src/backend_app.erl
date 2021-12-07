@@ -16,8 +16,17 @@
 %     ok.
 
 start(_StartType, _StartArgs) ->
-    Dispatch = cowboy_router:compile([{'_',
-                                       [{"/health", health_route, []}]}]),
+    Dispatch = cowboy_router:compile(
+        [
+            %% {HostMatch, list({PathMatch, Handler, InitialState})}
+            {'_', [
+                {"/process", process_route, #{}},
+                {"/data", data_route, #{}},
+                {"/health", health_route, #{}}
+            ]
+            }
+        ]
+    ),
     {ok, _} = cowboy:start_clear(http,
                                  [{port, 8080}],
                                  #{env => #{dispatch => Dispatch},
