@@ -32,3 +32,7 @@ After having started the nodes and stored some data via the frontend (for exampl
 ```erlang
 NewNode ! displayStore.
 ```
+
+TODO
+-----------------
+Test distributed system with docker.
