@@ -1,9 +1,11 @@
 -module(node).
--export([start/1, start/2]).
+-export([start/0, start/1, start/2]).
 
 -define(Stabilize, 1000).
 -define(Timeout, 3000).
 
+start() ->
+    start(key:generate()).
 start(Id) ->
     start(Id, nil).
 start(Id, Peer) ->
@@ -24,6 +26,7 @@ connect(Id, nil) ->
     {ok, {Id, self()}};
 connect(_, Peer) ->
     Qref = make_ref(),
+    io:format("~w to ~w~n", [Qref, Peer]),
     Peer ! {key, Qref, self()},
     receive
         {Qref, Skey} ->
@@ -124,21 +127,23 @@ notify({Nkey, Npid}, Id, Predecessor, Store) ->
     end.
 
 add(Key, Value, Qref, Client, Id, {Pkey, _}, {_, Spid}, Store) ->
-    io:format("~w ~w ~w ~n", [Key, Value, Id]),
-    case key:between(Key, Pkey, Id) of
+    HKey = key:hash(Key),
+    io:format("~w ~w ~w ~n", [HKey, Value, Id]),
+    case key:between(HKey, Pkey, Id) of
         true ->
             Client ! {Qref, ok} ,
-            storage:add(Key, Value, Store);            
+            storage:add(HKey, Value, Store);            
         false ->
             Spid ! {add, Key, Value, Qref, Client},
             Store
     end.
 
 lookup(Key, Qref, Client, Id, {Pkey, _}, Successor, Store) ->
-    io:format("lookup ~w in store ~w ~n", [Key, Store]),
-    case key:between(Key, Pkey, Id) of
+    HKey = key:hash(Key),
+    io:format("lookup ~w in store ~w ~n", [HKey, Store]),
+    case key:between(HKey, Pkey, Id) of
         true ->
-            {_, Value} = storage:lookup(Key, Store),
+            {_, Value} = storage:lookup(HKey, Store),
             Client ! {Qref, Value};
         false ->
             {_, Spid} = Successor,

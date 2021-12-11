@@ -23,7 +23,7 @@ Start an erlang shell and define a `sname` different than `node0`:
 In the erlang shell, start a new node and connect it by passing the `Peer` in the second argument (do not forget to replace `<LOCATION>` by the correct value).
 
 ```erlang
-Id = 10.  % Change the Id for other nodes.
+Id = key:generate().  % Change the Id for other nodes.
 NewNode = node:start(Id, {node0, 'node0@<LOCATION>'}).
 ```
 

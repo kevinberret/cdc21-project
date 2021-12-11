@@ -18,7 +18,7 @@ content_types_provided(Req, State) ->
      State}.
 
 get_data(Req, State) ->
-    Key = binary_to_integer(cowboy_req:binding(key, Req)),
+    Key = cowboy_req:binding(key, Req),
     Res = data:get(Key),
     case Res of
         timeout ->
@@ -44,7 +44,7 @@ post_data(Req, _) ->
 
     case DecodedData of
         {[{<<"key">>, Key}, {<<"value">>, Value}]} ->
-            StoreRes = data:post(binary_to_integer(Key), Value),
+            StoreRes = data:post(Key, Value),
             io:format("POST /process add a key/value ~w/~w~n", [Key, Value])
     end,
 

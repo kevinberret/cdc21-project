@@ -35,7 +35,7 @@ start(_StartType, _StartArgs) ->
                                        [cowboy_router,
                                         ca_cowboy_middleware,
                                         cowboy_handler]}),
-    BaseNode = node:start(0),
+    BaseNode = node:start(key:generate()),
     register(node0, BaseNode),
 
     backend_sup:start_link().
