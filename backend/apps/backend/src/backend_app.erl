@@ -28,15 +28,26 @@ start(_StartType, _StartArgs) ->
             }
         ]
     ),
+    Port = 8080,
     {ok, _} = cowboy:start_clear(http,
-                                 [{port, 8080}],
+                                 [{port, Port}],
                                  #{env => #{dispatch => Dispatch},
                                    middlewares =>
                                        [cowboy_router,
                                         ca_cowboy_middleware,
                                         cowboy_handler]}),
+    io:format("===================================== ~n"),
+    io:format("My name is ~w~n", [node()]),
+    io:format("===================================== ~n"),
+    io:format("~n"),
+    io:format("~n"),
+    io:format("~n"),
+    io:format("~n"),
+    io:format("Starting the backend node on ~w...~n", [Port]),
     BaseNode = node:start(key:generate()),
+    io:format("Registering backend node's name...~n"),
     register(node0, BaseNode),
+    io:format("Backend node started, ready...~n"),
 
     backend_sup:start_link().
 

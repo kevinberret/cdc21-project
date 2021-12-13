@@ -3,36 +3,28 @@ backend
 
 An OTP application
 
-Build
------
+Distributed Hash Table with docker
+----------------------------------
 
-    $ rebar3 compile
+Create a network
 
-Start API
----------
+    $ docker network create --subnet 192.168.165.1/24 cdc21-project
 
-    $ rebar3 shell -sname node0
+Make sure you are in the project's root folder and compile the backend image
 
-Start other nodes
------------------
+    $ docker build -t cdc21project-backend .
 
-Start an erlang shell and define a `sname` different than `node0`:
+Start a docker container for the backend with the compiled image
 
-    $ erl -sname node2
+    $ docker run --rm -it --name backend -h backend --network cdc21-project -p 8080:8080 --ip 192.168.165.2 cdc21project-backend
 
-In the erlang shell, start a new node and connect it by passing the `Peer` in the second argument (do not forget to replace `<LOCATION>` by the correct value).
+Launch as many other nodes as needed (change the hostname for each node)
 
-```erlang
-Id = key:generate().  % Change the Id for other nodes.
-NewNode = node:start(Id, {node0, 'node0@<LOCATION>'}).
-```
+    $ docker run --rm -it --hostname node3 --network cdc21-project -v $(pwd)/backend:/data erlang /data/run_node.sh
 
-After having started the nodes and stored some data via the frontend (for example), you can send a message to the node to see its storage:
+In each node, in the erl shell, run the next commands:
 
-```erlang
-NewNode ! displayStore.
-```
+    $ Id = key:generate().
+    $ NewNode = node:start(Id, {node0, 'node0@192.168.165.2'}).
 
-TODO
------------------
-Test distributed system with docker.
+

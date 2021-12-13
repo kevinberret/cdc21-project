@@ -1,6 +1,6 @@
--sname backend
+-name node0@192.168.165.2
 
--setcookie backend_cookie
+-setcookie cdc21project
 
 +K true
 +A30
