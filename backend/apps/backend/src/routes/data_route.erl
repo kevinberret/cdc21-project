@@ -24,13 +24,13 @@ get_data(Req, State) ->
         timeout ->
             % Return timeout error.
             cowboy_req:reply(
-                404,
+                408,
                 Req
             );
         false ->
             % Return timeout error.
             cowboy_req:reply(
-                404,
+                408,
                 Req
             );
         _ ->
@@ -45,22 +45,21 @@ post_data(Req, _) ->
     case DecodedData of
         {[{<<"key">>, Key}, {<<"value">>, Value}]} ->
             StoreRes = data:post(Key, Value),
-            io:format("POST /process add a key/value ~w/~w~n", [Key, Value])
+            io:format("POST data add a key/value ~w/~w~n", [Key, Value])
     end,
 
     case StoreRes of
         timeout ->
             % Return timeout error.
-            cowboy_req:reply(
-                404,
-                Req
-            );
+            Code = 408;
         {inserted, {_, _}, _} ->
-            cowboy_req:reply(
-                201,
-                Req
-            )
-    end.
+            Code = 201
+    end,
+
+    cowboy_req:reply(
+        Code,
+        Req
+    ).
 
 known_methods(Req, State) ->
     Result = [<<"GET">>, <<"POST">>],
