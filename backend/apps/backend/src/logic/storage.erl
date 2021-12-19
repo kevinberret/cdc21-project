@@ -1,5 +1,5 @@
 -module(storage).
--export([create/0, add/3, lookup/2, split/2, merge/2]).
+-export([create/0, add/3, lookup/2, split/2, merge/2, to_json/1]).
 
 create() ->
     [].
@@ -17,3 +17,7 @@ split(Key, L) ->
 
 merge(L1, L2) ->
     lists:keymerge(1, L1, L2).
+
+to_json(L)->
+    F = fun({Key, Value}, Acc) -> [#{utils:ref_hash_to_string(Key) => Value} | Acc] end,
+    lists:foldl(F, [], L).

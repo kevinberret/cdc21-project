@@ -83,6 +83,13 @@ node(Id, Predecessor, Successor, Store, Next) ->
             node(Id, Predecessor, Successor, Store, Next);
         displayInfo ->
             io:format("Node ~w: my pred is ~w my succ is ~w my next is ~w ~n", [Id, Predecessor, Successor, Next]),
+            node(Id, Predecessor, Successor, Store, Next);
+        {initRepresentation, Qref, Client} ->
+            {_, _, Spid} = Successor,
+            Spid ! {representation, Qref, Client, Id, []},
+            node(Id, Predecessor, Successor, Store, Next);
+        {representation, Qref, Client, BaseId, Representation} ->
+            representation(Qref, Client, BaseId, Id, Predecessor, Successor, Next, Store, Representation),
             node(Id, Predecessor, Successor, Store, Next)
     end.
 
@@ -202,3 +209,24 @@ down(Ref, Predecessor, {_, Ref, _}, {Nkey, Npid}) ->
     drop(Ref),
     Nref = monitor(Npid),
     {Predecessor, {Nkey, Nref, Npid}, nil}.
+
+representation(Qref, Client, BaseRef, ThisRef, Predecessor, Successor, Next, Store, Representation) ->
+    {_, _, Spid} = Successor,
+    {Pref, _, _} = Predecessor,
+    {Nref, _} = Next,
+    ThisStore = storage:to_json(Store),
+    ThisRepresentation = #{
+        <<"hash">> => utils:ref_hash_to_string(ThisRef),
+        <<"name">> => node(),
+        <<"store">> => ThisStore,
+        <<"predecessor">> => utils:ref_hash_to_string(Pref),
+        <<"next">> => utils:ref_hash_to_string(Nref)
+    },
+    WholeRepresentation = [ThisRepresentation | Representation],
+    case ThisRef == BaseRef of
+        % The whole DHT has been traversed.
+        true ->
+            Client ! {Qref, WholeRepresentation};
+        false ->
+            Spid ! {representation, Qref, Client, BaseRef, WholeRepresentation}
+    end.

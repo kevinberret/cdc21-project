@@ -16,6 +16,7 @@ start(_StartType, _StartArgs) ->
             {
                 '_', 
                 [
+                    {"/chordy", chordy_route, #{}},
                     {"/data", data_route, #{}},
                     {"/data/:key", data_route, #{}},
                     {"/health", health_route, #{}}

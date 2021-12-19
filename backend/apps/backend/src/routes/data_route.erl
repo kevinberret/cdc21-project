@@ -17,29 +17,36 @@ content_types_provided(Req, State) ->
      Req,
      State}.
 
-get_data(Req, State) ->
-    Key = cowboy_req:binding(key, Req),
+get_data(Req0, State) ->
+    Key = cowboy_req:binding(key, Req0),
     Res = data:get(Key),
     case Res of
         timeout ->
             % Return timeout error.
-            cowboy_req:reply(
+            Req = cowboy_req:reply(
                 408,
-                Req
+                Req0
             );
         false ->
             % Return timeout error.
-            cowboy_req:reply(
+            Req = cowboy_req:reply(
                 408,
-                Req
+                Req0
             );
         _ ->
             % Return value found.
-            {jiffy:encode(#{<<"value">> => Res}), Req, State}
-    end.
+            Body = jiffy:encode(#{<<"value">> => Res}),
+            Req = cowboy_req:reply(
+                200,
+                #{<<"content-type">> => <<"application/json">>},
+                Body,
+                Req0
+            )
+    end,
+    {ok, Req, State}.
 
-post_data(Req, _) ->
-    {ok, EncodedData, _} = cowboy_req:read_body(Req),
+post_data(Req0, State) ->
+    {ok, EncodedData, _} = cowboy_req:read_body(Req0),
     DecodedData = jiffy:decode(EncodedData),
 
     case DecodedData of
@@ -56,10 +63,11 @@ post_data(Req, _) ->
             Code = 201
     end,
 
-    cowboy_req:reply(
+    Req = cowboy_req:reply(
         Code,
-        Req
-    ).
+        Req0
+    ),
+    {ok, Req, State}.
 
 known_methods(Req, State) ->
     Result = [<<"GET">>, <<"POST">>],
