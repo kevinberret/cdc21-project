@@ -10,13 +10,14 @@ Create a network
 
     $ docker network create --subnet 192.168.165.1/24 cdc21-project
 
-Make sure you are in the project's root folder and compile the backend image
+You can either compile the image and start a container with this compiled image:
 
     $ docker build -t cdc21project-backend .
-
-Start a docker container for the backend with the compiled image
-
     $ docker run --rm -it --name backend -h backend --network cdc21-project -p 8080:8080 --ip 192.168.165.2 cdc21project-backend
+
+OR use the image on dockerhub
+
+    $ docker run --rm -it --name backend -h backend --network cdc21-project kevinberret/cdc21project-backend:latest
 
 Launch as many other nodes as needed (change the hostname for each node)
 

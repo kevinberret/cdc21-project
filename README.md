@@ -1,16 +1,3 @@
 # cdc21-project
-This is a frontend allowing to interact with the Chordy implementation done in the "backend" folder.
 
-## Dockerisation
-
-Build frontend image
-
-    $ docker build -t cdc21project-frontend . 
-
-Start the frontend
-
-    $ docker run -d -p 80:80 cdc21project-frontend
-
-Open a web browser and go to the following url
-
-    $ http://localhost
+This project has been done during the Distributed system course. It consists of a backend developped in Erlang relying on a cowboy HTTP server responsible for the REST API and of a frontend allowing to interact with the Chordy implementation thanks to the REST API. After having started the backend (ie the main node), it is possible ton connect more nodes to the DHT. For more information, please refer to the README document in the backend folder. To start the frontend, please refer to the README document in the frontend folder.
