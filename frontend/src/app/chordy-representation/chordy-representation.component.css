@@ -1,0 +1,9 @@
+:host() table {
+    width: 100%;
+    text-align: left;
+}
+
+:host() .nodeDetailsTitle {
+    font-weight: bold;
+    text-align: left;
+}

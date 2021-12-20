@@ -10,18 +10,22 @@ import { RetrieveDataComponent } from './retrieve-data/retrieve-data.component';
 
 // AngularMaterial imports
 import { MatButtonModule } from '@angular/material/button';
+import { MatExpansionModule } from '@angular/material/expansion';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatTableModule } from '@angular/material/table';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { NotificationComponent } from './notification/notification.component';
+import { ChordyRepresentationComponent } from './chordy-representation/chordy-representation.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     StoreDataComponent,
     RetrieveDataComponent,
-    NotificationComponent
+    NotificationComponent,
+    ChordyRepresentationComponent
   ],
   imports: [
     BrowserModule,
@@ -30,9 +34,11 @@ import { NotificationComponent } from './notification/notification.component';
     BrowserAnimationsModule,
     // AngularMaterial
     MatButtonModule,
+    MatExpansionModule,
     MatIconModule,
     MatInputModule,
     MatSnackBarModule,
+    MatTableModule,
     MatToolbarModule
   ],
   providers: [],

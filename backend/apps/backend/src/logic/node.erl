@@ -211,7 +211,7 @@ down(Ref, Predecessor, {_, Ref, _}, {Nkey, Npid}) ->
     {Predecessor, {Nkey, Nref, Npid}, nil}.
 
 representation(Qref, Client, BaseRef, ThisRef, Predecessor, Successor, Next, Store, Representation) ->
-    {_, _, Spid} = Successor,
+    {Sref, _, Spid} = Successor,
     {Pref, _, _} = Predecessor,
     {Nref, _} = Next,
     ThisStore = storage:to_json(Store),
@@ -220,6 +220,7 @@ representation(Qref, Client, BaseRef, ThisRef, Predecessor, Successor, Next, Sto
         <<"name">> => node(),
         <<"store">> => ThisStore,
         <<"predecessor">> => utils:ref_hash_to_string(Pref),
+        <<"successor">> => utils:ref_hash_to_string(Sref),
         <<"next">> => utils:ref_hash_to_string(Nref)
     },
     WholeRepresentation = [ThisRepresentation | Representation],
